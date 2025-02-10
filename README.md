@@ -49,6 +49,14 @@ Tips from it
 - weather
 - image data
 
+#### EY 2022
+https://challenge.ey.com/past-challenges
+link for 2022's challenge
+
+solution of 1st place winner:
+https://github.com/maze508
+https://medium.com/@maze508/global-winner-better-working-world-data-challenge-2022-level-3-frog-counting-tool-adb5b495efbe
+
 ## Timeline
 
 1st meeting: Feb 2nd
