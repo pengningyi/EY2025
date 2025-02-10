@@ -12,12 +12,10 @@ Team member: Ningyi Peng, Wanxian Chen, Afrin Turna
 ## Data
 
 ### Feature Datasets
-
 - 1. European Sentinel-2 optical satellite data
 - 2. NASA Landsat optical satellite data
 
 ## Additional Datasets
-
 - 3. Building footprints of the Bronx and Manhattan regions
 - 4. Detailed local weather dataset of the Bronx and Manhattan regions on 24 July 2021
 
@@ -26,16 +24,13 @@ Team member: Ningyi Peng, Wanxian Chen, Afrin Turna
 
 
 ## Model
-
 - input: location
 - output: UHI index
-
 
 ## Tips
 - More bands
 - Using larger time period than just a day's
 - Create a buffer to reduce the error from spatial autocorrelation
-
 
 ## Past year challenge
 
@@ -49,16 +44,32 @@ https://github.com/Double-Y-EY-Challenge-2024 (Top 10)
 https://github.com/kazuma2002/EY-2024-Coastal-Resilience
 https://github.com/Marlup/2024-EY-challenge-Coastal-Resilience-Phase-1
 
-## Schedule
-
-- EY2024: Ningyi, 1, 2
-- EY2023: Afrin, 3, 4
-- EY2022: Wanxian, 2, 4
+Tips from it
+- data enhancing
+- weather
+- image data
 
 ## Timeline
 
 1st meeting: Feb 2nd
 2st meeting: Feb 10th
+3rd meeting: Feb 17th 8pm.
+
+
 
 # Implementation
 - install the required packages using `pip install -r requirements.txt`.
+
+
+## Schedule
+
+- testing scoring methods - Ningyi
+- finding more relevant data, and then process it - Afrin
+- download the Sentinel2 (13 variables), Landsat (19 variables) data, if possible push to github - Wanxian
+- build up a XGBoosting, NN - Ningyi
+- come up with the whole workflow - Afrin
+    - def data_processing():
+    - def feature_selection():
+    - def training_model():
+    - def generate_submission():
+- literature review (data) - Wanxian
