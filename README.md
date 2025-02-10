@@ -31,15 +31,23 @@ Team member: Ningyi Peng, Wanxian Chen, Afrin Turna
 - output: UHI index
 
 
+## Tips
+- More bands
+- Using larger time period than just a day's
+- Create a buffer to reduce the error from spatial autocorrelation
+
+
 ## Past year challenge
 
-https://challenge.ey.com/challenges/past/tropical-cyclone-damage-assessment-lrrno2xm?id=6523d842d39bfc776beadda7
+#### 2024 - IMAGE CLASSIFICATION PROBLEM
+
+https://challenge.ey.com/challenges/tropical-cyclone-damage-assessment-lrrno2xm/overview
 This is the link for 2024's challenge.
 
-
 Here's some solution to 2024's challenge:
-https://github.com/Double-Y-EY-Challenge-2024
-
+https://github.com/Double-Y-EY-Challenge-2024 (Top 10)
+https://github.com/kazuma2002/EY-2024-Coastal-Resilience
+https://github.com/Marlup/2024-EY-challenge-Coastal-Resilience-Phase-1
 
 ## Schedule
 
@@ -51,3 +59,6 @@ https://github.com/Double-Y-EY-Challenge-2024
 
 1st meeting: Feb 2nd
 2st meeting: Feb 10th
+
+# Implementation
+- install the required packages using `pip install -r requirements.txt`.
