@@ -49,6 +49,13 @@ https://github.com/Double-Y-EY-Challenge-2024 (Top 10)
 https://github.com/kazuma2002/EY-2024-Coastal-Resilience
 https://github.com/Marlup/2024-EY-challenge-Coastal-Resilience-Phase-1
 
+https://challenge.ey.com/past-challenges
+link for 2022's challenge
+
+solution of 1st place winner:
+https://github.com/maze508
+https://medium.com/@maze508/global-winner-better-working-world-data-challenge-2022-level-3-frog-counting-tool-adb5b495efbe
+
 ## Schedule
 
 - EY2024: Ningyi, 1, 2
