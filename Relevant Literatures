@@ -1,5 +1,16 @@
 # Summary of Findings for Relevant Literatures
 
 1. A review on the generation, determination and mitigation of Urban Heat Island: https://www.sciencedirect.com/science/article/abs/pii/S1001074208600194
-This paper provides a comprehensive analysis of the factors influencing UHI
-A. Primary Heat Sources
+  This paper provides a comprehensive analysis of the factors influencing UHI:
+    A. Primary Heat Sources:
+      1. Anthropogenic Heat: vehicles, power plants, air conditioners, and industrial activities, can be estimated based on energy consumption and population density
+      2. Indirect Solar Heating (ISH): heat stored and re-radiated by urban structures. Dependent on building materials, urban density, and albedo, and affected by sky view factor(i.e., the openness of urban canyons to the sky)
+    B. Environmental and Meteorological Factors:
+      1. Wind Speed & Cloud Cover: UHI intensity is negatively correlated with wind speed and cloud cover
+      2. Solar Radiation: Higher daytime solar radiation increases UHI, but nighttime cooling is also affected
+      3. Humidity & Latent Heat Flux: Evapotranspiration plays a role in cooling; areas with more vegetation exhibit lower UHI intensity
+    C. Urban Design and Land Cover:
+      1. Building Material & Thermal Properties: Low-albedo materials (e.g., asphalt, concrete) retain more heat; High thermal admittance materials store and slowly release heat
+      2. Green Spaces & Vegetation Cover: greenery reduce UHI through shading and evapotranspiration; reduced vegetation leads to lower latent heat flux and higher surface temperatures
+      3. Urban Geometry & Sky View Factor (SVF): Tall, dense buildings trap heat and reduce nighttime cooling; SVF influences long-wave radiation emission and affects heat dissipation
+      4. Population Density & Urban Activity: Higher population densities correlate with increased anthropogenic heat emissions; However, the relationship is complex and depends on urban planning
