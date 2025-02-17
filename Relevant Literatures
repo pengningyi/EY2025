@@ -1,6 +1,6 @@
 # Summary of Findings for Relevant Literatures
 
-1. A review on the generation, determination and mitigation of Urban Heat Island: https://www.sciencedirect.com/science/article/abs/pii/S1001074208600194
+1. ‘A review on the generation, determination and mitigation of Urban Heat Island’: https://www.sciencedirect.com/science/article/abs/pii/S1001074208600194
   This paper provides a comprehensive analysis of the factors influencing UHI:
     A. Primary Heat Sources:
       1. Anthropogenic Heat: vehicles, power plants, air conditioners, and industrial activities, can be estimated based on energy consumption and population density
@@ -14,3 +14,17 @@
       2. Green Spaces & Vegetation Cover: greenery reduce UHI through shading and evapotranspiration; reduced vegetation leads to lower latent heat flux and higher surface temperatures
       3. Urban Geometry & Sky View Factor (SVF): Tall, dense buildings trap heat and reduce nighttime cooling; SVF influences long-wave radiation emission and affects heat dissipation
       4. Population Density & Urban Activity: Higher population densities correlate with increased anthropogenic heat emissions; However, the relationship is complex and depends on urban planning
+
+2. ‘A statistical model for the urban heat island and its application to a climate change scenario’: https://rmets.onlinelibrary.wiley.com/doi/10.1002/joc.2348
+  It presents a linear statistical model to predict the nocturnal UHI intensity, based on meteorological observations:
+    A. Key Factors for UHI Prediction:
+      1. Wind Speed (FF): Negative correlation: Higher wind speeds reduce UHI by increasing ventilation and heat dispersion
+      2. Previous Day’s Cloud Cover (CC): Negative correlation: Clouds absorb and emit long-wave radiation, reducing temperature variations and heat storage in urban surfaces
+      3. Relative Humidity (RH): Negative correlation: Higher humidity increases condensation in rural areas before urban areas, reducing the temperature difference
+      4. Air Pressure (P): Weak influence: Explains only 7.6% of UHI variance
+      5. Water Vapor Pressure (WVP): No significant relationship with UHI (R² = 0.2%)
+    B. Statistical Model for UHI Prediction:
+      ΔTu−r = aFF + bCC + cRH + d + ϵ
+      This model explains 42% of UHI variance
+
+3. 
