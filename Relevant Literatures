@@ -62,3 +62,20 @@
     E. Best Performing Neural Network:
       1. The Elman Neural Network (ENN) with the Levenberg-Marquardt training function achieved the best performance.
       2. Evaluated using: MSE, Prediction accuracy, R2
+
+5. 'Investigating important urban characteristics in the formation of urban heat islands: A machine learning approach': https://journalofbigdata.springeropen.com/articles/10.1186/s40537-018-0113-z
+  This paper explores the use of random forest to identify key factors contributing to UHI formation:
+    A. The study integrates three types of data:
+      1. Land Surface Temperature (LST) Data (Dependent Variable): Derived from thermal infrared (TIR) bands of Landsat 7 ETM+; Converted from digital number (DN) to temperature values using standard equations
+      2. Urban Physical Characteristics (Independent Variables): Land cover (impervious surfaces, vegetation, tree canopy); Building attributes (height, footprint area); Parcel area and zoning type
+      3. Socioeconomic Variables (Independent Variables): Population density, age distribution, race, income, rental units, education levels
+    B. RF Model Parameters:
+      1. ntree = 500
+      2. Number of variables per split = Square root of total variables
+      3. Out-of-Bag (OOB) Sampling was used for unbiased error estimation
+      4. PCA was used to confirm the RF-selected variables by identifying key principal components in the dataset
+    C. Results:
+      1. Most Important Variables for UHI Formation: 
+        i. Percentage of Impervious Surfaces (Positive Correlation): More paved areas = higher temperatures
+        ii. Normalized Difference Vegetation Index (NDVI) (Negative Correlation): More vegetation = lower temperatures
+      2. Other significant variables: Building height and footprint (taller and denser buildings retain heat); Tree canopy coverage (reduces UHI intensity); Socioeconomic factors (income, race, age, housing characteristics)
