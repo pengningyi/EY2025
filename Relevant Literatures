@@ -27,4 +27,14 @@
       ΔTu−r = aFF + bCC + cRH + d + ϵ
       This model explains 42% of UHI variance
 
-3. 
+3. 'ArcUHI: A GIS add-in for automated modelling of the Urban Heat Island effect through machine learning': https://www.sciencedirect.com/science/article/abs/pii/S2212095522001213
+  A. This paper confirms some of the factors discovered in the first paper:
+    1. Building Height: Taller buildings intensified the street canyon effect, trapping heat
+    2. Albedo: Higher albedo values (reflective surfaces) reduced UHI intensity
+    3. Sky View Factor (SVF): Low SVF (more obstructed sky) was associated with higher UHI
+    4. Elevation and Slope: Higher elevations exhibited lower UHI due to heat dissipation
+    5. Urban Fabric and Roads: Increased built-up areas correlated with higher UHI intensity
+  B. It tested 3 models:
+    1. Multiple Linear Regression (MLR): Provides interpretability but has low predictive accuracy
+    2. Support Vector Regression (SVR): Captures nonlinear relationships but requires significant computational resources
+    3. Random Forest Regression (RFR): Achieved the best performance with high predictive accuracy
