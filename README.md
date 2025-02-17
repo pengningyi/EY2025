@@ -65,27 +65,12 @@ https://medium.com/@maze508/global-winner-better-working-world-data-challenge-20
 
 3rd meeting: Feb 17th 8pm.
 
+4th meeting: Feb 21st, 4pm.
 
 
 # Implementation
 - install the required packages using `pip install -r requirements.txt`.
 - For running the code, `python3 main.py --model-type XGBoost`
-
-
-
-## Schedule
-
-- testing scoring methods - Ningyi
-- finding more relevant data, and then process it - Afrin
-- download the Sentinel2 (13 variables), Landsat (19 variables) data, if possible push to github - Wanxian
-- build up a XGBoosting, NN - Ningyi
-- come up with the whole workflow - Afrin
-    - def data_processing():
-    - def feature_selection():
-    - def training_model():
-    - def generate_submission():
-- literature review (data) - Wanxian
-
 
 # Training
 
@@ -109,3 +94,11 @@ so we use MAE and MSE as Loss func. Huber Loss as well.
 - For baseline model, we have 0.5108
 - For all 1s, we have 0
 - For all random normal ~ (1, 0.1), we have -36
+
+
+## Schedule
+
+- generate the truth value of the submission - Afrin
+- find & combine the data (according to Heather's research) - Heather
+- optimize the workflow (combine codes) - Ningyi
+
