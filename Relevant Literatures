@@ -1,0 +1,81 @@
+# Summary of Findings for Relevant Literatures
+
+1. ‘A review on the generation, determination and mitigation of Urban Heat Island’: https://www.sciencedirect.com/science/article/abs/pii/S1001074208600194
+  This paper provides a comprehensive analysis of the factors influencing UHI:
+    A. Primary Heat Sources:
+      1. Anthropogenic Heat: vehicles, power plants, air conditioners, and industrial activities, can be estimated based on energy consumption and population density
+      2. Indirect Solar Heating (ISH): heat stored and re-radiated by urban structures. Dependent on building materials, urban density, and albedo, and affected by sky view factor(i.e., the openness of urban canyons to the sky)
+    B. Environmental and Meteorological Factors:
+      1. Wind Speed & Cloud Cover: UHI intensity is negatively correlated with wind speed and cloud cover
+      2. Solar Radiation: Higher daytime solar radiation increases UHI, but nighttime cooling is also affected
+      3. Humidity & Latent Heat Flux: Evapotranspiration plays a role in cooling; areas with more vegetation exhibit lower UHI intensity
+    C. Urban Design and Land Cover:
+      1. Building Material & Thermal Properties: Low-albedo materials (e.g., asphalt, concrete) retain more heat; High thermal admittance materials store and slowly release heat
+      2. Green Spaces & Vegetation Cover: greenery reduce UHI through shading and evapotranspiration; reduced vegetation leads to lower latent heat flux and higher surface temperatures
+      3. Urban Geometry & Sky View Factor (SVF): Tall, dense buildings trap heat and reduce nighttime cooling; SVF influences long-wave radiation emission and affects heat dissipation
+      4. Population Density & Urban Activity: Higher population densities correlate with increased anthropogenic heat emissions; However, the relationship is complex and depends on urban planning
+
+2. ‘A statistical model for the urban heat island and its application to a climate change scenario’: https://rmets.onlinelibrary.wiley.com/doi/10.1002/joc.2348
+  It presents a linear statistical model to predict the nocturnal UHI intensity, based on meteorological observations:
+    A. Key Factors for UHI Prediction:
+      1. Wind Speed (FF): Negative correlation: Higher wind speeds reduce UHI by increasing ventilation and heat dispersion
+      2. Previous Day’s Cloud Cover (CC): Negative correlation: Clouds absorb and emit long-wave radiation, reducing temperature variations and heat storage in urban surfaces
+      3. Relative Humidity (RH): Negative correlation: Higher humidity increases condensation in rural areas before urban areas, reducing the temperature difference
+      4. Air Pressure (P): Weak influence: Explains only 7.6% of UHI variance
+      5. Water Vapor Pressure (WVP): No significant relationship with UHI (R² = 0.2%)
+    B. Statistical Model for UHI Prediction:
+      ΔTu−r = aFF + bCC + cRH + d + ϵ
+      This model explains 42% of UHI variance
+
+3. 'ArcUHI: A GIS add-in for automated modelling of the Urban Heat Island effect through machine learning': https://www.sciencedirect.com/science/article/abs/pii/S2212095522001213
+  A. This paper confirms some of the factors discovered in the first paper:
+    1. Building Height: Taller buildings intensified the street canyon effect, trapping heat
+    2. Albedo: Higher albedo values (reflective surfaces) reduced UHI intensity
+    3. Sky View Factor (SVF): Low SVF (more obstructed sky) was associated with higher UHI
+    4. Elevation and Slope: Higher elevations exhibited lower UHI due to heat dissipation
+    5. Urban Fabric and Roads: Increased built-up areas correlated with higher UHI intensity
+  B. It tested 3 models:
+    1. Multiple Linear Regression (MLR): Provides interpretability but has low predictive accuracy
+    2. Support Vector Regression (SVR): Captures nonlinear relationships but requires significant computational resources
+    3. Random Forest Regression (RFR): Achieved the best performance with high predictive accuracy
+
+4. 'Development of a model for urban heat island prediction using neural network techniques': https://www.sciencedirect.com/science/article/abs/pii/S221067071100014X
+  This paper uesed artificial neural networks:
+    A. Data:
+      1. Date & Time: Converted into numerical values (days of the year, minutes of the day)
+      2. Ambient Temperature (°C): Measured at different locations
+      3. Global Solar Radiation (W/m²): Collected from the National Observatory of Athens
+      4. Data were normalized in the range [-1,1] to improve ANN training
+    B. 3 Neural Networks Tested:
+      1. Cascade Neural Network (CNN)
+      2. Elman Neural Network (ENN)
+      3. Feed-Forward Neural Network (FNN)
+    C. Training Algorithms Tested:
+      1. Levenberg-Marquardt (trainlm)
+      2. Scaled Conjugate Gradient (trainscg)
+      3. BFGS Quasi-Newton (trainbfg)
+      4. Gradient Descent (traingd, traingdm)
+      5. Resilient Backpropagation (traingnrp)
+    D. Network Configuration:
+      1. Hidden Layers: 1-3 layers, each with 20–40 neurons
+      2. Activation Function: Tangent sigmoid function
+    E. Best Performing Neural Network:
+      1. The Elman Neural Network (ENN) with the Levenberg-Marquardt training function achieved the best performance.
+      2. Evaluated using: MSE, Prediction accuracy, R2
+
+5. 'Investigating important urban characteristics in the formation of urban heat islands: A machine learning approach': https://journalofbigdata.springeropen.com/articles/10.1186/s40537-018-0113-z
+  This paper explores the use of random forest to identify key factors contributing to UHI formation:
+    A. The study integrates three types of data:
+      1. Land Surface Temperature (LST) Data (Dependent Variable): Derived from thermal infrared (TIR) bands of Landsat 7 ETM+; Converted from digital number (DN) to temperature values using standard equations
+      2. Urban Physical Characteristics (Independent Variables): Land cover (impervious surfaces, vegetation, tree canopy); Building attributes (height, footprint area); Parcel area and zoning type
+      3. Socioeconomic Variables (Independent Variables): Population density, age distribution, race, income, rental units, education levels
+    B. RF Model Parameters:
+      1. ntree = 500
+      2. Number of variables per split = Square root of total variables
+      3. Out-of-Bag (OOB) Sampling was used for unbiased error estimation
+      4. PCA was used to confirm the RF-selected variables by identifying key principal components in the dataset
+    C. Results:
+      1. Most Important Variables for UHI Formation: 
+        i. Percentage of Impervious Surfaces (Positive Correlation): More paved areas = higher temperatures
+        ii. Normalized Difference Vegetation Index (NDVI) (Negative Correlation): More vegetation = lower temperatures
+      2. Other significant variables: Building height and footprint (taller and denser buildings retain heat); Tree canopy coverage (reduces UHI intensity); Socioeconomic factors (income, race, age, housing characteristics)
