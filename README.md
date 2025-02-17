@@ -60,13 +60,17 @@ https://medium.com/@maze508/global-winner-better-working-world-data-challenge-20
 ## Timeline
 
 1st meeting: Feb 2nd
+
 2st meeting: Feb 10th
+
 3rd meeting: Feb 17th 8pm.
 
 
 
 # Implementation
 - install the required packages using `pip install -r requirements.txt`.
+- For running the code, `python3 main.py --model-type XGBoost`
+
 
 
 ## Schedule
@@ -81,3 +85,27 @@ https://medium.com/@maze508/global-winner-better-working-world-data-challenge-20
     - def training_model():
     - def generate_submission():
 - literature review (data) - Wanxian
+
+
+# Training
+
+
+## Models
+- xgb
+- mlp
+- wide_deep
+- tabnet
+
+## Loss function
+Since the methodology used to determine the scores on the leaderboard is the R-Squared score, 
+
+$$\R^2 = 1 - \frac{\sum(y_{true} - y_{pred})^2}{\sum(y_{true} - \bar y_{true})^2}$$
+
+so we use MAE and MSE as Loss func. Huber Loss as well.
+
+
+
+# Scoring
+- For baseline model, we have 0.5108
+- For all 1s, we have 0
+- For all random normal ~ (1, 0.1), we have -36

@@ -10,3 +10,5 @@ planetary-computer==0.4.8
 odc-stac==0.3.6
 stackstac==0.4.3
 azure-storage-blob
+pytorch_tabnet
+xgboost

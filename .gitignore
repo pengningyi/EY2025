@@ -173,3 +173,4 @@ cython_debug/
 
 # attempt files
 ignore/
+results/
