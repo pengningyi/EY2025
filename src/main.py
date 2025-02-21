@@ -8,9 +8,12 @@ from mlp import MLPTrainer
 from wideDeep import WideAndDeepTrainer
 from tabnet import TabNetTrainer
 from xgb_trainer import XGBoostTrainer
+from data import get_sentinel_data
 
 def main(args):
     os.makedirs(args.results_path, exist_ok=True)
+    
+    get_sentinel_data()
 
     print("Loading data...")
     X, y = load_data(args.data_path)
