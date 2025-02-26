@@ -2,8 +2,7 @@ import argparse
 import os
 import json
 import numpy as np
-from sklearn.model_selection import train_test_split
-from utils import load_data, scale_data, split_data
+from utils import load_data, scale_data, split_data, generate_submission
 from mlp import MLPTrainer
 from wideDeep import WideAndDeepTrainer
 from tabnet import TabNetTrainer
@@ -16,7 +15,7 @@ def main(args):
     get_sentinel_data()
 
     print("Loading data...")
-    X, y = load_data(args.data_path)
+    X, y = load_data(get_sentinel_data())
     X = scale_data(X)
 
     if args.model_type == "MLP":
@@ -56,6 +55,10 @@ def main(args):
     with open(results_path, "w") as f:
         json.dump(results, f, indent=4)
     print(f"Results saved to {results_path}")
+    
+    
+    print("Generating submission")
+    generate_submission(trainer)
     
     
 

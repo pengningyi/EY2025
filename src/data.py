@@ -11,8 +11,6 @@ import rioxarray as rio
 import rasterio
 from matplotlib.cm import RdYlGn,jet,RdBu
 from tqdm import tqdm
-
-# Import Planetary Computer tools
 import stackstac
 import pystac_client
 import planetary_computer 
@@ -35,12 +33,13 @@ def save_index_as_tiff(index_data, filename, gt, width, height):
                        crs='epsg:4326', transform=gt, count=1, compress='lzw', dtype='float64') as dst:
         dst.write(index_data.values, 1)
         
-# Function to map satellite data to geo-locations
 def map_satellite_data(combined_data, csv_path, transform, crs, buffer_radius=None):
-    # Read the CSV file using pandas
     df = pd.read_csv(csv_path)
     latitudes = df['Latitude'].values
     longitudes = df['Longitude'].values
+    uhi = df['UHI Index'].values
+    
+    # print(df.columns)
 
     # Convert lat/long to the GeoTIFF's CRS
     proj_wgs84 = Proj(init='epsg:4326')  # EPSG:4326 is the common lat/long CRS
@@ -48,7 +47,7 @@ def map_satellite_data(combined_data, csv_path, transform, crs, buffer_radius=No
     transformer = Transformer.from_proj(proj_wgs84, proj_tiff)
 
     band_values = {f'Band_{i+1}': [] for i in range(combined_data.shape[0])}
-
+    
     # Iterate over the latitudes and longitudes, and extract the corresponding band values
     for lat, lon in tqdm(zip(latitudes, longitudes), total=len(latitudes), desc="Mapping values"):
         x, y = transformer.transform(lat, lon)
@@ -73,11 +72,13 @@ def map_satellite_data(combined_data, csv_path, transform, crs, buffer_radius=No
 
     # Create a DataFrame with the band values
     df = pd.DataFrame(band_values)
-
+    df['Latitude'] = latitudes
+    df['Longitude'] = longitudes
+    df['UHI Index'] = uhi
     return df
 
 
-def get_sentinel_data():
+def get_sentinel_data(dataset = "train"):
     stac = pystac_client.Client.open("https://planetarycomputer.microsoft.com/api/stac/v1")
 
     search = stac.search(
@@ -134,11 +135,19 @@ def get_sentinel_data():
     # Save the median composite
     #he median composite is saved as a GeoTIFF file with four bands
     with rasterio.open(median_filename, 'w', driver='GTiff', width=width, height=height,
-                    crs='epsg:4326', transform=gt, count=4, compress='lzw', dtype='float64') as dst:
+                    crs='epsg:4326', transform=gt, count=12, compress='lzw', dtype='float64') as dst:
+           
         dst.write(median.B01, 1)
-        dst.write(median.B04, 2)
-        dst.write(median.B06, 3)
-        dst.write(median.B08, 4)
+        dst.write(median.B02, 2)
+        dst.write(median.B03, 3)
+        dst.write(median.B04, 4)
+        dst.write(median.B05, 5)
+        dst.write(median.B06, 6)
+        dst.write(median.B07, 7)
+        dst.write(median.B08, 8)
+        dst.write(median.B8A, 9)
+        dst.write(median.B11, 11)
+        dst.write(median.B12, 12)
     
         # Save NDVI
     save_index_as_tiff(ndvi_median, ndvi_filename, gt, width, height)
@@ -185,10 +194,21 @@ def get_sentinel_data():
         transform = src.transform
         crs = src.crs
 
-    # Mapping satellite data with training data
-    final_data = map_satellite_data(combined_data, 'Training_data_uhi_index.csv', transform, crs, buffer_radius=50)
+    col_name = ["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B11", "B12", "ndvi", "ndbi", "ndwi"]
 
+    # Mapping satellite data with training data
+    if dataset == "train":
+        final_data = map_satellite_data(combined_data, '../data/Training_data_uhi_index_2025-02-18.csv', transform, crs, buffer_radius=50)
+    else:
+        final_data = map_satellite_data(combined_data, '../data/Submission_template.csv', transform, crs, buffer_radius=50)
+        final_data.drop(columns = ["UHI Index"], inplace=True)
+        
+    
+    print("AAAAAAAAAAAAAAAAAAAAAAAAa")
+    
     # Display the final data
-    print(final_data.head())
+    # print(final_data.head())
     
     final_data.to_csv("combined_data.csv", index=False)
+    
+    return final_data

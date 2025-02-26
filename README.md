@@ -98,7 +98,6 @@ so we use MAE and MSE as Loss func. Huber Loss as well.
 
 ## Schedule
 
-- generate the truth value of the submission - Afrin
-- find & combine the data (according to Heather's research) - Heather
-- optimize the workflow (combine codes) - Ningyi
+- combine everything together
+- 
 

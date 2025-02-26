@@ -56,7 +56,7 @@ class MLPTrainer:
         self.model.eval()
         X_test = torch.tensor(X_test, dtype=torch.float32).to(self.device)
         with torch.no_grad():
-            return self.model(X_test).squeeze().cpu().numpy()
+            return self.model(X_test).squeeze()
     
     def evaluate(self, X_test, y_test):
         y_pred = self.predict(X_test)

@@ -17,10 +17,9 @@ warnings.filterwarnings('ignore')
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-def load_data(data_path):
+def load_data(data):
     """Load data from a CSV file."""
-    data = pd.read_csv(data_path)
-    X = data.drop(columns=["UHI Index", "Longitude", "Latitude", "datetime"])
+    X = data.drop(columns=["UHI Index", "Longitude", "Latitude"])
     y = data["UHI Index"]
     return X, y
 
@@ -68,47 +67,6 @@ def get_transform_crs(tiff_path):
         crs = src.crs
     return transform, crs
 
-# Function to map satellite data to geo-locations
-def map_satellite_data(combined_data, csv_path, transform, crs, buffer_radius=None):
-    # Read the CSV file using pandas
-    df = pd.read_csv(csv_path)
-    latitudes = df['Latitude'].values
-    longitudes = df['Longitude'].values
-
-    # Convert lat/long to the GeoTIFF's CRS
-    proj_wgs84 = Proj(init='epsg:4326')  # EPSG:4326 is the common lat/long CRS
-    proj_tiff = Proj(crs)
-    transformer = Transformer.from_proj(proj_wgs84, proj_tiff)
-
-    band_values = {f'Band_{i+1}': [] for i in range(combined_data.shape[0])}
-
-    # Iterate over the latitudes and longitudes, and extract the corresponding band values
-    for lat, lon in tqdm(zip(latitudes, longitudes), total=len(latitudes), desc="Mapping values"):
-        x, y = transformer.transform(lat, lon)
-        row, col = ~transform * (x, y)  # Transform to row, col in the array
-
-        if buffer_radius:
-            # Create a buffer around the location and calculate the average values within the buffer
-            row_min = max(int(row - buffer_radius), 0)
-            row_max = min(int(row + buffer_radius), combined_data.shape[1])
-            col_min = max(int(col - buffer_radius), 0)
-            col_max = min(int(col + buffer_radius), combined_data.shape[2])
-            for i in range(combined_data.shape[0]):
-                band_value = combined_data[i, row_min:row_max, col_min:col_max].mean()
-                band_values[f'Band_{i+1}'].append(band_value)
-        else:
-            # Extract the nearest pixel value
-            row = int(row)
-            col = int(col)
-            for i in range(combined_data.shape[0]):
-                band_value = combined_data[i, row, col]
-                band_values[f'Band_{i+1}'].append(band_value)
-
-    # Create a DataFrame with the band values
-    df = pd.DataFrame(band_values)
-
-    return df
-
 
 def remove_dup(df, cols):
     for col in cols:
@@ -140,11 +98,6 @@ def feature_selection(data, target):
     target = data[target]
     
     return features, target
-
-
-def split_data(features, target):
-    X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=0.2, random_state=42)  
-    return X_train, X_test, y_train, y_test
 
 
 def scale_features(train, test):
@@ -191,29 +144,40 @@ def r2_score(target, predictions):
 
 
 
-def generate_submission(model, test_data_path, submission_path, tiff_path, csv_path):
+def generate_submission(trainer, test_data_path = '../data/Submission_template.csv', data_type = 'tensor'):
     """
     Generate predictions and create a submission file.
     """
-    # Load the test data
+    # # Load the test data
     test_data = pd.read_csv(test_data_path)
-    # Mapping satellite data for submission.
-    val_data = map_satellite_data(tiff_path, combine_two_datasets)
+    # # Mapping satellite data for submission.
+    from data import get_sentinel_data
+    val_data = get_sentinel_data(dataset="test")
+    
+    # val_data = read_csv("combined_Data.csv")
 
     # Extracting specific columns (B01, B06, and NDVI) from the validation dataset
-    submission_val_data=val_data.loc[:,[...]]
+    submission_val_data=val_data.drop(columns = ["Latitude", "Longitude"])
+    
+    print(submission_val_data.head(5))
     
     # Feature Scaling 
     submission_val_data = submission_val_data.values
     
-    transformed_submission_data = sc.transform(submission_val_data)
+    from sklearn.preprocessing import StandardScaler
+
+    scaler = StandardScaler()
+    transformed_submission_data = scaler.fit_transform(submission_val_data)
     
+    if data_type == 'tensor':
+        transformed_submission_data = torch.tensor(transformed_submission_data, dtype=torch.float32)
+
     #Making predictions
-    final_predictions = model.predict(transformed_submission_data)
+    final_predictions = trainer.predict(transformed_submission_data)
     final_prediction_series = pd.Series(final_predictions)
     
     #Combining the results into dataframe
     submission_df = pd.DataFrame({'Longitude':test_data['Longitude'].values, 'Latitude':test_data['Latitude'].values, 'UHI Index':final_prediction_series.values})
 
     #Dumping the predictions into a csv file.
-    submission_df.to_csv("submission.csv",index = False)
+    submission_df.to_csv("../submission/submission.csv",index = False)

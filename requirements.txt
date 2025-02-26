@@ -12,3 +12,6 @@ stackstac==0.4.3
 azure-storage-blob
 pytorch_tabnet
 xgboost
+h5netcdf
+netCDF4
+cartopy
