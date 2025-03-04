@@ -1,7 +1,6 @@
 import argparse
 import os
 import json
-import numpy as np
 from utils import load_data, scale_data, split_data, generate_submission
 from mlp import MLPTrainer
 from wideDeep import WideAndDeepTrainer
@@ -23,21 +22,28 @@ def main(args):
                              hidden_units=args.hidden_units,
                              dropout_rate=args.dropout_rate,
                              learning_rate=args.lr)
+        results_path = os.path.join(args.results_path, f"{args.model_type}_{args.epochs}_{args.batch_size}_{args.lr}_{args.seed}_results.json")
     elif args.model_type == "WideAndDeep":
         X_train, X_val, X_test, y_train, y_val, y_test = split_data(X, y, args.test_size, args.val_size, args.seed, data_type="tensor")
         trainer = WideAndDeepTrainer(input_dim=X_train.shape[1],
                                      wide_units=args.wide_units,
                                      deep_units=args.deep_units,
                                      learning_rate=args.lr)
+        results_path = os.path.join(args.results_path, f"{args.model_type}_{args.epochs}_{args.batch_size}_{args.lr}_{args.seed}_results.json")
     elif args.model_type == "TabNet":
         X_train, X_val, X_test, y_train, y_val, y_test = split_data(X, y, args.test_size, args.val_size, args.seed, data_type="tensor")
         trainer = TabNetTrainer()
+        results_path = os.path.join(args.results_path, f"{args.model_type}_{args.epochs}_{args.batch_size}_{args.lr}_{args.seed}_results.json")
     elif args.model_type == "XGBoost":
         X_train, X_val, X_test, y_train, y_val, y_test = split_data(X, y, args.test_size, args.val_size, args.seed, data_type="dataframe")
-        trainer = XGBoostTrainer()
+        trainer = XGBoostTrainer(args.lr, args.n_estimators, args.max_depth,
+                                 args.subsample, args.colsample_bytree,
+                                 args.reg_alpha, args.reg_lambda, args.seed)
+        results_path = os.path.join(args.results_path, f"{args.model_type}_{args.n_estimators}_{args.max_depth}_{args.lr}_{args.subsample}_{args.colsample_bytree}_{args.reg_alpha}_{args.reg_lambda}_{args.seed}_results.json")
     elif args.model_type == "ModelBlender":
         X_train, X_val, X_test, y_train, y_val, y_test = split_data(X, y, args.test_size, args.val_size, args.seed, data_type="dataframe")
         trainer = ModelBlender()
+        results_path = os.path.join(args.results_path, f"{args.model_type}_{args.epochs}_{args.batch_size}_{args.lr}_{args.seed}_results.json")
     else:
         raise ValueError(f"Unsupported model type: {args.model_type}")
 
@@ -53,15 +59,13 @@ def main(args):
         "test_rmse": test_rmse,
         "parameters": vars(args)
     }
-    results_path = os.path.join(args.results_path, f"{args.model_type}_{args.epochs}_{args.batch_size}_{args.lr}_{args.seed}_results.json")
+    
     with open(results_path, "w") as f:
         json.dump(results, f, indent=4)
     print(f"Results saved to {results_path}")
     
-    
     print("Generating submission")
     generate_submission(trainer)
-    
     
 
 if __name__ == "__main__":
@@ -81,10 +85,17 @@ if __name__ == "__main__":
 
     parser.add_argument("--hidden_units", type=int, nargs="*", default=[16, 8], help="Hidden units for MLP.")
     parser.add_argument("--dropout_rate", type=float, default=0.3, help="Dropout rate for MLP.")
+    
     parser.add_argument("--wide_units", type=int, default=64, help="Wide units for WideAndDeep.")
     parser.add_argument("--deep_units", type=int, nargs="*", default=[64, 64], help="Deep units for WideAndDeep.")
-    parser.add_argument("--max_depth", type=int, default=10, help="Max depth for XGBoost.")
+    
+    parser.add_argument("--max_depth", type=int, default=12, help="Max depth for XGBoost.")
     parser.add_argument("--n_estimators", type=int, default=500, help="Number of estimators for XGBoost.")
-
+    parser.add_argument("--subsample", type=float, default=0.7, help="")
+    parser.add_argument("--colsample_bytree", type=float, default=0.8, help="")
+    parser.add_argument("--reg_alpha", type=float, default=0.1, help="")
+    parser.add_argument("--reg_lambda", type=float, default=0.2, help="")
+    
+    
     args = parser.parse_args()
     main(args)

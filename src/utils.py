@@ -148,32 +148,25 @@ def generate_submission(trainer, test_data_path = '../data/Submission_template.c
     """
     Generate predictions and create a submission file.
     """
-    # # Load the test data
     test_data = pd.read_csv(test_data_path)
-    # # Mapping satellite data for submission.
+
     from data import get_sentinel_data
     val_data = get_sentinel_data(dataset="test")
 
-    # Extracting specific columns (B01, B06, and NDVI) from the validation dataset
     submission_val_data=val_data.drop(columns = ["Latitude", "Longitude"])
-    
-    # Feature Scaling 
+
     submission_val_data = submission_val_data.values
     
     from sklearn.preprocessing import StandardScaler
-
     scaler = StandardScaler()
     transformed_submission_data = scaler.fit_transform(submission_val_data)
     
     if data_type == 'tensor':
         transformed_submission_data = torch.tensor(transformed_submission_data, dtype=torch.float32)
 
-    #Making predictions
     final_predictions = trainer.predict(transformed_submission_data)
     final_prediction_series = pd.Series(final_predictions)
-    
-    #Combining the results into dataframe
+
     submission_df = pd.DataFrame({'Longitude':test_data['Longitude'].values, 'Latitude':test_data['Latitude'].values, 'UHI Index':final_prediction_series.values})
 
-    #Dumping the predictions into a csv file.
     submission_df.to_csv("../submission/submission.csv",index = False)

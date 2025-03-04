@@ -2,19 +2,18 @@ from xgboost import XGBRegressor
 from sklearn.metrics import root_mean_squared_error
 
 class XGBoostTrainer:
-    def __init__(self, params=None):
-        default_params = {
-            'n_estimators': 1000,
-            'learning_rate': 0.005,
-            'max_depth': 12,
-            'subsample': 0.6,
-            'colsample_bytree': 0.7,
-            'reg_alpha': 0.1,  # L1 regularization (default is higher, reduce it)
-            'reg_lambda': 0.1,  # L2 regularization (same)
-            'random_state': 42
+    def __init__(self, learning_rate, n_estimators, max_depth, subsample, colsample_bytree, reg_alpha, reg_lambda, random_state):
+        params = {
+            'learning_rate': learning_rate,
+            'n_estimators': n_estimators,
+            'max_depth': max_depth,
+            'subsample': subsample,
+            'colsample_bytree': colsample_bytree,
+            'reg_alpha': reg_alpha,  # L1 regularization (default is higher, reduce it)
+            'reg_lambda': reg_lambda,  # L2 regularization (same)
+            'random_state': random_state
         }
-        self.params = params if params else default_params
-        self.model = XGBRegressor(**self.params)
+        self.model = XGBRegressor(**params)
 
     def fit(self, X_train, y_train, X_val, y_val, epochs=50, batch_size=32):
         self.model.fit(X_train, y_train)

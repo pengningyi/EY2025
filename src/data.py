@@ -1,17 +1,11 @@
 # Supress Warnings 
 import warnings
 warnings.filterwarnings('ignore')
+import numpy as np
 import pandas as pd
 from pyproj import Proj, Transformer
-# Import common GIS tools
-import numpy as np
-import xarray as xr
-import matplotlib.pyplot as plt
-import rioxarray as rio
 import rasterio
-from matplotlib.cm import RdYlGn,jet,RdBu
 from tqdm import tqdm
-import stackstac
 import pystac_client
 import planetary_computer 
 from odc.stac import stac_load
@@ -97,15 +91,12 @@ def get_sentinel_data(dataset = "train"):
     # Define the scale according to our selected crs, so we will use degrees
     resolution = 10  # meters per pixel 
     scale = resolution / 111320.0 # degrees per pixel for crs=4326 
-
-    #!pip install "dask[diagnostics]" --upgrade
-    #!pip install jinja2
-
-    import dask, jinja2
+    
+    BANDS = ["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B11", "B12"]
     
     data = stac_load(
         items,
-        bands=["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B11", "B12"],
+        bands=BANDS,
         crs="EPSG:4326", # Latitude-Longitude
         resolution=scale, # Degrees
         chunks={"x": 2048, "y": 2048},
@@ -126,7 +117,6 @@ def get_sentinel_data(dataset = "train"):
     ndvi_filename = "ndvi_median.tiff"
     ndbi_filename = "ndbi_median.tiff"
     ndwi_filename = "ndwi_median.tiff"
-
 
     height = median.dims["latitude"]
     width = median.dims["longitude"]
@@ -149,30 +139,17 @@ def get_sentinel_data(dataset = "train"):
         dst.write(median.B11, 11)
         dst.write(median.B12, 12)
     
-        # Save NDVI
     save_index_as_tiff(ndvi_median, ndvi_filename, gt, width, height)
-
-    # Save NDBI
     save_index_as_tiff(ndbi_median, ndbi_filename, gt, width, height)
-
-    # Save NDWI
     save_index_as_tiff(ndwi_median, ndwi_filename, gt, width, height)
-    
-    import numpy as np
 
     # Load the median composite
     with rasterio.open("median_composite.tiff") as src:
         median_data = src.read()  # This will load all bands
-
-    # Load the NDVI index
     with rasterio.open("ndvi_median.tiff") as src:
         ndvi_data = src.read(1)  # Load the first (and only) band
-
-    # Load the NDBI index
     with rasterio.open("ndbi_median.tiff") as src:
         ndbi_data = src.read(1)  # Load the first (and only) band
-
-    # Load the NDWI index
     with rasterio.open("ndwi_median.tiff") as src:
         ndwi_data = src.read(1)  # Load the first (and only) band
 
@@ -194,7 +171,7 @@ def get_sentinel_data(dataset = "train"):
         transform = src.transform
         crs = src.crs
 
-    col_name = ["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B11", "B12", "ndvi", "ndbi", "ndwi"]
+    col_name = BANDS + ["ndvi", "ndbi", "ndwi"]
 
     # Mapping satellite data with training data
     if dataset == "train":
@@ -203,12 +180,4 @@ def get_sentinel_data(dataset = "train"):
         final_data = map_satellite_data(combined_data, '../data/Submission_template.csv', transform, crs, buffer_radius=50)
         final_data.drop(columns = ["UHI Index"], inplace=True)
         
-    
-    print("AAAAAAAAAAAAAAAAAAAAAAAAa")
-    
-    # Display the final data
-    # print(final_data.head())
-    
-    final_data.to_csv("combined_data.csv", index=False)
-    
     return final_data
