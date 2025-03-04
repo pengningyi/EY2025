@@ -87,7 +87,6 @@ class MLPTrainer:
 
             if patience >= early_stop_patience:
                 print(f"Early stopping triggered at epoch {epoch+1}.")
-                # Restore best model state before stopping
                 if best_model_state is not None:
                     self.model.load_state_dict(best_model_state)
                 break
