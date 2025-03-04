@@ -32,12 +32,12 @@ def scale_data(X):
     return X_scaled
 
 
-def split_data(X, y, test_size=0.2, val_size=0.2, seed=42, data_type='dataframe'):
+def split_data(X, y, test_size=0.2, val_size=0.2, seed=42, data_type='dataframe', add_noise=True):
     """Split data into training, validation, and test sets."""
     X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=test_size, random_state=seed, shuffle=False)
     val_size_adjusted = val_size / (1 - test_size)
     X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=val_size_adjusted, random_state=seed, shuffle=False)
-    
+        
     if data_type == 'tensor':
         X_train = torch.tensor(X_train, dtype=torch.float32)
         X_val = torch.tensor(X_val, dtype=torch.float32)
@@ -45,6 +45,14 @@ def split_data(X, y, test_size=0.2, val_size=0.2, seed=42, data_type='dataframe'
         y_train = torch.tensor(y_train.values, dtype=torch.float32)
         y_val = torch.tensor(y_val.values, dtype=torch.float32)
         y_test = torch.tensor(y_test.values, dtype=torch.float32)
+
+    if add_noise:
+        if isinstance(X_train, torch.Tensor):
+            X_train += torch.randn(X_train.shape) * 1e-4
+        else:
+            X_train += np.random.randn(*X_train.shape) * 1e-4
+
+        
     return X_train, X_val, X_test, y_train, y_val, y_test
 
 
