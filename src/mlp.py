@@ -49,11 +49,15 @@ class MLPTrainer:
         self.criterion = nn.HuberLoss()  # Mean Squared Error for regression
         self.optimizer = optim.AdamW(self.model.parameters(), lr=learning_rate, weight_decay=1e-5) #from Adam to AdamW
     
-    def fit(self, X_train, y_train, X_val, y_val, epochs=50, batch_size=32):
+    def fit(self, X_train, y_train, X_val, y_val, epochs=50, batch_size=32, early_stop_patience=10):
         self.model.train()
         X_train, y_train = X_train.to(self.device), y_train.to(self.device)
         X_val, y_val = X_val.to(self.device), y_val.to(self.device)
 
+        best_val_loss = float('inf')
+        best_model_state = None
+        patience = 0
+        
         for epoch in range(epochs):
             # Training
             self.model.train()
@@ -73,7 +77,20 @@ class MLPTrainer:
             with torch.no_grad():
                 val_outputs = self.model(X_val).squeeze()
                 val_loss = self.criterion(val_outputs, y_val).item()
-            print(f"Epoch {epoch+1}/{epochs}, Training Loss: {loss:.4f} Validation Loss: {val_loss:.4f}")
+            print(f"Epoch {epoch+1}/{epochs}, Validation Loss: {val_loss:.4f}")
+
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
+                best_model_state = copy.deepcopy(self.model.state_dict())
+                patience = 0
+            else:
+                patience += 1
+
+            if patience >= early_stop_patience:
+                print(f"Early stopping triggered at epoch {epoch+1}.")
+                if best_model_state is not None:
+                    self.model.load_state_dict(best_model_state)
+                break
     
     def predict(self, X_test):
         self.model.eval()
