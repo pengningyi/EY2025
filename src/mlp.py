@@ -10,30 +10,37 @@ class MLPModel(nn.Module):
         self.model = nn.Sequential(
             nn.Linear(input_dim, 256),
             nn.ReLU(),
+            nn.BatchNorm1d(256),
             nn.Dropout(dropout_rate),
 
             nn.Linear(256, 128),
             nn.ReLU(),
+            nn.BatchNorm1d(128),
             nn.Dropout(dropout_rate),
 
             nn.Linear(128, 64),
             nn.ReLU(),
+            nn.BatchNorm1d(64),
+            nn.Dropout(dropout_rate),
+
+            nn.Linear(64, 64),
+            nn.ReLU
+            nn.BatchNorm1d(64),
             nn.Dropout(dropout_rate),
 
             nn.Linear(64, 64),
             nn.ReLU(),
-            nn.Dropout(dropout_rate),
-
-            nn.Linear(64, 64),
-            nn.ReLU(),
+            nn.BatchNorm1d(64),
             nn.Dropout(dropout_rate),
 
             nn.Linear(64, 16),
             nn.ReLU(),
+            nn.BatchNorm1d(16),
             nn.Dropout(dropout_rate),
 
             nn.Linear(16, 8),
             nn.ReLU(),
+            nn.BatchNorm1d(8),
             nn.Dropout(dropout_rate),
 
             nn.Linear(8, 1)
