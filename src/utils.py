@@ -153,13 +153,9 @@ def generate_submission(trainer, test_data_path = '../data/Submission_template.c
     # # Mapping satellite data for submission.
     from data import get_sentinel_data
     val_data = get_sentinel_data(dataset="test")
-    
-    # val_data = read_csv("combined_Data.csv")
 
     # Extracting specific columns (B01, B06, and NDVI) from the validation dataset
     submission_val_data=val_data.drop(columns = ["Latitude", "Longitude"])
-    
-    print(submission_val_data.head(5))
     
     # Feature Scaling 
     submission_val_data = submission_val_data.values

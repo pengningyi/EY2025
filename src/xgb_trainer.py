@@ -4,11 +4,13 @@ from sklearn.metrics import root_mean_squared_error
 class XGBoostTrainer:
     def __init__(self, params=None):
         default_params = {
-            'n_estimators': 500,
-            'learning_rate': 0.05,
-            'max_depth': 6,
-            'subsample': 0.8,
-            'colsample_bytree': 0.8,
+            'n_estimators': 1000,
+            'learning_rate': 0.005,
+            'max_depth': 12,
+            'subsample': 0.6,
+            'colsample_bytree': 0.7,
+            'reg_alpha': 0.1,  # L1 regularization (default is higher, reduce it)
+            'reg_lambda': 0.1,  # L2 regularization (same)
             'random_state': 42
         }
         self.params = params if params else default_params
