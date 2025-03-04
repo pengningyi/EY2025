@@ -4,27 +4,49 @@ import torch.optim as optim
 from sklearn.metrics import root_mean_squared_error
 
 class MLPModel(nn.Module):
-    def __init__(self, input_dim, hidden_units=[128, 64], dropout_rate=0.2):
+    def __init__(self, input_dim, hidden_units=[128, 64], dropout_rate=0.3):
         super(MLPModel, self).__init__()
         self.model = nn.Sequential(
-            nn.Linear(input_dim, hidden_units[0]),
+            nn.Linear(input_dim, 256),
             nn.ReLU(),
             nn.Dropout(dropout_rate),
-            nn.Linear(hidden_units[0], hidden_units[1]),
+
+            nn.Linear(256, 128),
             nn.ReLU(),
             nn.Dropout(dropout_rate),
-            nn.Linear(hidden_units[1], 1)  # Regression output
+
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Dropout(dropout_rate),
+
+            nn.Linear(64, 64),
+            nn.ReLU(),
+            nn.Dropout(dropout_rate),
+
+            nn.Linear(64, 64),
+            nn.ReLU(),
+            nn.Dropout(dropout_rate),
+
+            nn.Linear(64, 16),
+            nn.ReLU(),
+            nn.Dropout(dropout_rate),
+
+            nn.Linear(16, 8),
+            nn.ReLU(),
+            nn.Dropout(dropout_rate),
+
+            nn.Linear(8, 1)
         )
     
     def forward(self, x):
         return self.model(x)
 
 class MLPTrainer:
-    def __init__(self, input_dim, hidden_units=[128, 64], dropout_rate=0.2, learning_rate=0.001):
+    def __init__(self, input_dim, hidden_units=[128, 64], dropout_rate=0.3, learning_rate=0.001): #dropout_rate from 0.2 to 0.3
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = MLPModel(input_dim, hidden_units, dropout_rate).to(self.device)
         self.criterion = nn.MSELoss()  # Mean Squared Error for regression
-        self.optimizer = optim.Adam(self.model.parameters(), lr=learning_rate)
+        self.optimizer = optim.AdamW(self.model.parameters(), lr=learning_rate, weight_decay=1e-5) #from Adam to AdamW
     
     def fit(self, X_train, y_train, X_val, y_val, epochs=50, batch_size=32):
         self.model.train()
