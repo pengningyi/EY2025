@@ -34,9 +34,9 @@ def scale_data(X):
 
 def split_data(X, y, test_size=0.2, val_size=0.2, seed=42, data_type='dataframe'):
     """Split data into training, validation, and test sets."""
-    X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=test_size, random_state=seed)
+    X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=test_size, random_state=seed, shuffle=False)
     val_size_adjusted = val_size / (1 - test_size)
-    X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=val_size_adjusted, random_state=seed)
+    X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=val_size_adjusted, random_state=seed, shuffle=False)
     
     if data_type == 'tensor':
         X_train = torch.tensor(X_train, dtype=torch.float32)

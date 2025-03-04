@@ -1,7 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from sklearn.metrics import root_mean_squared_error
+from sklearn.metrics import root_mean_squared_error, mean_absolute_error
+from loss import huber_loss, custom_weighted_rmse
 
 class MLPModel(nn.Module):
     def __init__(self, input_dim, hidden_units=[128, 64], dropout_rate=0.3):
@@ -45,7 +46,7 @@ class MLPTrainer:
     def __init__(self, input_dim, hidden_units=[128, 64], dropout_rate=0.3, learning_rate=0.001): #dropout_rate from 0.2 to 0.3
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = MLPModel(input_dim, hidden_units, dropout_rate).to(self.device)
-        self.criterion = nn.MSELoss()  # Mean Squared Error for regression
+        self.criterion = nn.HuberLoss()  # Mean Squared Error for regression
         self.optimizer = optim.AdamW(self.model.parameters(), lr=learning_rate, weight_decay=1e-5) #from Adam to AdamW
     
     def fit(self, X_train, y_train, X_val, y_val, epochs=50, batch_size=32):
@@ -72,7 +73,7 @@ class MLPTrainer:
             with torch.no_grad():
                 val_outputs = self.model(X_val).squeeze()
                 val_loss = self.criterion(val_outputs, y_val).item()
-            print(f"Epoch {epoch+1}/{epochs}, Validation Loss: {val_loss:.4f}")
+            print(f"Epoch {epoch+1}/{epochs}, Training Loss: {loss:.4f} Validation Loss: {val_loss:.4f}")
     
     def predict(self, X_test):
         self.model.eval()
@@ -82,6 +83,11 @@ class MLPTrainer:
     
     def evaluate(self, X_test, y_test):
         y_pred = self.predict(X_test)
+        
         rmse = root_mean_squared_error(y_test, y_pred)
-        print(f"MLP RMSE: {rmse:.4f}")
-        return rmse
+        mae = mean_absolute_error(y_test, y_pred)
+        huber = huber_loss(y_test, y_pred)
+        custom_rmse = custom_weighted_rmse(y_test, y_pred)
+        print(f"RMSE: {rmse}, MAE: {mae}, Huber: {huber}, Custom RMSE: {custom_rmse}")
+        print(f"XGBoost RMSE: {rmse}")
+        return huber

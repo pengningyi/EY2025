@@ -76,7 +76,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--model_type", type=str, required=True, choices=["MLP", "WideAndDeep", "TabNet", "XGBoost","ModelBlender"], help="Type of model to train.")
 
-    parser.add_argument("--epochs", type=int, default=20, help="Number of training epochs.")
+    parser.add_argument("--epochs", type=int, default=10, help="Number of training epochs.")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size.")
     parser.add_argument("--lr", type=float, default=0.005, help="Learning rate.")
     parser.add_argument("--test_size", type=float, default=0.2, help="Proportion of the dataset to use as the test set.")
@@ -90,11 +90,11 @@ if __name__ == "__main__":
     parser.add_argument("--deep_units", type=int, nargs="*", default=[64, 64], help="Deep units for WideAndDeep.")
     
     parser.add_argument("--max_depth", type=int, default=12, help="Max depth for XGBoost.")
-    parser.add_argument("--n_estimators", type=int, default=500, help="Number of estimators for XGBoost.")
-    parser.add_argument("--subsample", type=float, default=0.7, help="")
-    parser.add_argument("--colsample_bytree", type=float, default=0.8, help="")
-    parser.add_argument("--reg_alpha", type=float, default=0.1, help="")
-    parser.add_argument("--reg_lambda", type=float, default=0.2, help="")
+    parser.add_argument("--n_estimators", type=int, default=1000, help="Number of estimators for XGBoost.")
+    parser.add_argument("--subsample", type=float, default=0.6, help="")
+    parser.add_argument("--colsample_bytree", type=float, default=0.7, help="")
+    parser.add_argument("--reg_alpha", type=float, default=0, help="")
+    parser.add_argument("--reg_lambda", type=float, default=0, help="")
     
     
     args = parser.parse_args()

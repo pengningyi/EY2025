@@ -1,7 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from sklearn.metrics import root_mean_squared_error
+from sklearn.metrics import root_mean_squared_error, mean_absolute_error
+from loss import huber_loss, custom_weighted_rmse
 
 class WideAndDeepModel(nn.Module):
     def __init__(self, input_dim, wide_units=128, deep_units=[128, 64]):
@@ -32,7 +33,7 @@ class WideAndDeepTrainer:
     def __init__(self, input_dim, wide_units=128, deep_units=[128, 64], learning_rate=0.001):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = WideAndDeepModel(input_dim, wide_units, deep_units).to(self.device)
-        self.criterion = nn.MSELoss()  # Mean Squared Error for regression
+        self.criterion = nn.HuberLoss()  # Mean Squared Error for regression
         self.optimizer = optim.Adam(self.model.parameters(), lr=learning_rate)
     
     def fit(self, X_train, y_train, X_val, y_val, epochs=50, batch_size=32):
@@ -69,6 +70,11 @@ class WideAndDeepTrainer:
     
     def evaluate(self, X_test, y_test):
         y_pred = self.predict(X_test)
+        
         rmse = root_mean_squared_error(y_test, y_pred)
-        print(f"Wide & Deep RMSE: {rmse:.4f}")
-        return rmse
+        mae = mean_absolute_error(y_test, y_pred)
+        huber = huber_loss(y_test, y_pred)
+        custom_rmse = custom_weighted_rmse(y_test, y_pred)
+        print(f"RMSE: {rmse}, MAE: {mae}, Huber: {huber}, Custom RMSE: {custom_rmse}")
+        print(f"XGBoost RMSE: {rmse}")
+        return huber

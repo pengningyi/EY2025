@@ -1,5 +1,6 @@
 from xgboost import XGBRegressor
-from sklearn.metrics import root_mean_squared_error
+from sklearn.metrics import root_mean_squared_error, mean_absolute_error
+from loss import huber_loss, custom_weighted_rmse
 
 class XGBoostTrainer:
     def __init__(self, learning_rate, n_estimators, max_depth, subsample, colsample_bytree, reg_alpha, reg_lambda, random_state):
@@ -13,7 +14,7 @@ class XGBoostTrainer:
             'reg_lambda': reg_lambda,  # L2 regularization (same)
             'random_state': random_state
         }
-        self.model = XGBRegressor(**params)
+        self.model = XGBRegressor(objective='reg:absoluteerror',**params)
 
     def fit(self, X_train, y_train, X_val, y_val, epochs=50, batch_size=32):
         self.model.fit(X_train, y_train)
@@ -23,6 +24,11 @@ class XGBoostTrainer:
     
     def evaluate(self, X_test, y_test):
         y_pred = self.predict(X_test)
+        
         rmse = root_mean_squared_error(y_test, y_pred)
+        mae = mean_absolute_error(y_test, y_pred)
+        huber = huber_loss(y_test, y_pred)
+        custom_rmse = custom_weighted_rmse(y_test, y_pred)
+        print(f"RMSE: {rmse}, MAE: {mae}, Huber: {huber}, Custom RMSE: {custom_rmse}")
         print(f"XGBoost RMSE: {rmse}")
         return rmse
