@@ -24,7 +24,7 @@ class MLPModel(nn.Module):
             nn.Dropout(dropout_rate),
 
             nn.Linear(64, 64),
-            nn.ReLU
+            nn.ReLU(),
             nn.BatchNorm1d(64),
             nn.Dropout(dropout_rate),
 

@@ -13,7 +13,7 @@ def main(args):
     os.makedirs(args.results_path, exist_ok=True)
     
     print("Loading data...")
-    X, y = load_data(get_sentinel_data())
+    X, y = load_data(get_sentinel_data(args.data_path))
     X = scale_data(X)
 
     if args.model_type == "MLP":
@@ -65,36 +65,37 @@ def main(args):
     print(f"Results saved to {results_path}")
     
     print("Generating submission")
-    generate_submission(trainer)
+    generate_submission(trainer, args.submission_data_path)
     
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train and evaluate models.")
 
-    parser.add_argument("--data_path", type=str, default= '../data/training_data.csv', help="Path to the data file.")
+    parser.add_argument("--data_path", type=str, default= 'C:\\Users\\16539\\Documents\\Aalto\\25spring\\EY2025\\data\\Training_data_uhi_index_2025-02-18.csv', help="Path to the data file.")
+    parser.add_argument("--submission_data_path", type=str, default= '../data/Submission_template.csv', help="Path to the submission file.")
     parser.add_argument("--results_path", type=str, default="../results", help="Directory to save results.")
 
     parser.add_argument("--model_type", type=str, required=True, choices=["MLP", "WideAndDeep", "TabNet", "XGBoost","ModelBlender"], help="Type of model to train.")
 
-    parser.add_argument("--epochs", type=int, default=10, help="Number of training epochs.")
+    parser.add_argument("--epochs", type=int, default=20, help="Number of training epochs.")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size.")
-    parser.add_argument("--lr", type=float, default=0.005, help="Learning rate.")
+    parser.add_argument("--lr", type=float, default=0.001, help="Learning rate.")
     parser.add_argument("--test_size", type=float, default=0.2, help="Proportion of the dataset to use as the test set.")
     parser.add_argument("--val_size", type=float, default=0.1, help="Proportion of the training set to use as the validation set.")
     parser.add_argument("--seed", type=int, default=42, help="Random seed.")
-
+ 
     parser.add_argument("--hidden_units", type=int, nargs="*", default=[16, 8], help="Hidden units for MLP.")
     parser.add_argument("--dropout_rate", type=float, default=0.3, help="Dropout rate for MLP.")
     
     parser.add_argument("--wide_units", type=int, default=64, help="Wide units for WideAndDeep.")
     parser.add_argument("--deep_units", type=int, nargs="*", default=[64, 64], help="Deep units for WideAndDeep.")
     
-    parser.add_argument("--max_depth", type=int, default=12, help="Max depth for XGBoost.")
-    parser.add_argument("--n_estimators", type=int, default=1000, help="Number of estimators for XGBoost.")
-    parser.add_argument("--subsample", type=float, default=0.6, help="")
-    parser.add_argument("--colsample_bytree", type=float, default=0.7, help="")
+    parser.add_argument("--max_depth", type=int, default=10, help="Max depth for XGBoost.")
+    parser.add_argument("--n_estimators", type=int, default=500, help="Number of estimators for XGBoost.")
+    parser.add_argument("--subsample", type=float, default=1, help="")
+    parser.add_argument("--colsample_bytree", type=float, default=1, help="")
     parser.add_argument("--reg_alpha", type=float, default=0, help="")
-    parser.add_argument("--reg_lambda", type=float, default=0, help="")
+    parser.add_argument("--reg_lambda", type=float, default=1, help="")
     
     
     args = parser.parse_args()

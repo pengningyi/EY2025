@@ -71,8 +71,65 @@ def map_satellite_data(combined_data, csv_path, transform, crs, buffer_radius=No
     df['UHI Index'] = uhi
     return df
 
+def get_lst_data(df):
+    import planetary_computer
+    import pystac_client
+    from IPython.display import display, Markdown
+    import xarray as xr
+    import fsspec
+    from scipy.spatial import cKDTree
+    
+    catalog = pystac_client.Client.open(
+        "https://planetarycomputer.microsoft.com/api/stac/v1",
+        modifier=planetary_computer.sign_inplace,
+    )
 
-def get_sentinel_data(dataset = "train"):
+    bbox = [-74.01, 40.75, -73.86, 40.88]
+    time_window = "2021-06-01/2021-09-01"
+
+    search = catalog.search(
+        bbox=bbox,
+        datetime=time_window,
+        collections=["sentinel-3-slstr-lst-l2-netcdf"],
+        query={"eo:cloud_cover": {"lt": 30}},
+    )
+
+    item = next(search.items())
+
+
+    dataset = xr.open_dataset(fsspec.open(item.assets["lst-in"].href).open())
+
+    geo = xr.open_dataset(fsspec.open(item.assets["slstr-geodetic-in"].href).open()).load()
+
+    lst_data = (
+        pd.DataFrame(
+            {
+                "longitude": geo.longitude_in.data.ravel(),
+                "latitude": geo.latitude_in.data.ravel(),
+                "lst": dataset.LST.load().data.ravel(),
+            }
+        )
+        .dropna()
+    )
+
+    coords = df[['Longitude', 'Latitude']].values
+    data_coords = lst_data[['longitude', 'latitude']].values
+
+    tree = cKDTree(data_coords)
+
+    _, indices = tree.query(coords, k=4)
+
+    closest_data_avg = lst_data.iloc[indices.flatten()].groupby(np.repeat(np.arange(len(coords)), 4)).mean()
+
+    merged_df = df.copy()
+    merged_df = merged_df.join(closest_data_avg.reset_index(drop=True), rsuffix='_avg')
+    merged_df.drop(columns = ["longitude","latitude"], inplace=True)
+
+    return merged_df
+
+
+
+def get_sentinel_data(data_path, dataset = "train"):
     stac = pystac_client.Client.open("https://planetarycomputer.microsoft.com/api/stac/v1")
 
     search = stac.search(
@@ -108,15 +165,24 @@ def get_sentinel_data(dataset = "train"):
     median = data.median(dim="time").compute() #to reduce the impact of clouds.
 
     ndvi_median = (median.B08 - median.B04) / (median.B08 + median.B04)
-
     ndbi_median = (median.B11 - median.B08) / (median.B11 + median.B08)
-
     ndwi_median = (median.B03 - median.B08) / (median.B03 + median.B08)
+    
+    eps = 1e-5
+        
+    median['B08_B04_ratio'] = median.B08 / (median.B04 + eps)
+    median['B11_B12_ratio'] = median.B11 / (median.B12 + eps)
+    median['B08_minus_B04'] = median.B08 - median.B04
+    median['B11_minus_B12'] = median.B11 - median.B12
+    median['EVI'] = 2.5 * (median.B08 - median.B04) / (median.B08 + 6 * median.B04 - 7.5 * median.B02 + 1 + eps)   
+    ndvi_ndwi_diff = ndvi_median - ndwi_median
+    
 
     median_filename = "median_composite.tiff"
     ndvi_filename = "ndvi_median.tiff"
     ndbi_filename = "ndbi_median.tiff"
     ndwi_filename = "ndwi_median.tiff"
+    ndvi_ndwi_diff_filename="ndvi_ndwi_diff.tiff"
 
     height = median.dims["latitude"]
     width = median.dims["longitude"]
@@ -125,8 +191,7 @@ def get_sentinel_data(dataset = "train"):
     # Save the median composite
     #he median composite is saved as a GeoTIFF file with four bands
     with rasterio.open(median_filename, 'w', driver='GTiff', width=width, height=height,
-                    crs='epsg:4326', transform=gt, count=12, compress='lzw', dtype='float64') as dst:
-           
+                    crs='epsg:4326', transform=gt, count=20, compress='lzw', dtype='float64') as dst:
         dst.write(median.B01, 1)
         dst.write(median.B02, 2)
         dst.write(median.B03, 3)
@@ -138,10 +203,16 @@ def get_sentinel_data(dataset = "train"):
         dst.write(median.B8A, 9)
         dst.write(median.B11, 11)
         dst.write(median.B12, 12)
+        dst.write(median.B08_B04_ratio, 13)
+        dst.write(median.B11_B12_ratio, 14)
+        dst.write(median.B08_minus_B04, 15)
+        dst.write(median.B11_minus_B12, 16)
+        dst.write(median.EVI, 17)
     
     save_index_as_tiff(ndvi_median, ndvi_filename, gt, width, height)
     save_index_as_tiff(ndbi_median, ndbi_filename, gt, width, height)
     save_index_as_tiff(ndwi_median, ndwi_filename, gt, width, height)
+    save_index_as_tiff(ndvi_ndwi_diff, ndvi_ndwi_diff_filename, gt, width, height)
 
     # Load the median composite
     with rasterio.open("median_composite.tiff") as src:
@@ -152,6 +223,8 @@ def get_sentinel_data(dataset = "train"):
         ndbi_data = src.read(1)  # Load the first (and only) band
     with rasterio.open("ndwi_median.tiff") as src:
         ndwi_data = src.read(1)  # Load the first (and only) band
+    with rasterio.open("ndvi_ndwi_diff.tiff") as src:
+        ndvi_ndwi_diff_data = src.read(1)
 
     # Combine all data into a single array for the ML model
     # Assuming median_data has shape (bands, height, width)
@@ -160,8 +233,13 @@ def get_sentinel_data(dataset = "train"):
         median_data,
         ndvi_data[np.newaxis, :, :],  # Add a new axis to match the shape
         ndbi_data[np.newaxis, :, :],  # Add a new axis to match the shape
-        ndwi_data[np.newaxis, :, :]   # Add a new axis to match the shape
+        ndwi_data[np.newaxis, :, :],
+        ndvi_ndwi_diff_data[np.newaxis, :, :]
     ])
+    
+    # PCA
+    
+    
 
     # Now combined_data has shape (bands + 3, height, width)
     # use this combined_data as input features for your ML model
@@ -171,13 +249,32 @@ def get_sentinel_data(dataset = "train"):
         transform = src.transform
         crs = src.crs
 
-    col_name = BANDS + ["ndvi", "ndbi", "ndwi"]
-
     # Mapping satellite data with training data
-    if dataset == "train":
-        final_data = map_satellite_data(combined_data, '../data/Training_data_uhi_index_2025-02-18.csv', transform, crs, buffer_radius=50)
-    else:
-        final_data = map_satellite_data(combined_data, '../data/Submission_template.csv', transform, crs, buffer_radius=50)
+    final_data = map_satellite_data(combined_data, data_path, transform, crs, buffer_radius=50)
+    
+    final_data = get_lst_data(final_data)
+ #!!!!!!
+    # feature engineering
+    final_data['ndvi'] = (final_data['Band_8'] - final_data['Band_4']) / (final_data['Band_8'] + final_data['Band_4'])
+    final_data['ndbi'] = (final_data['Band_10'] - final_data['Band_8']) / (final_data['Band_10'] + final_data['Band_8'])
+    final_data['ndwi'] = (final_data['Band_3'] - final_data['Band_8']) / (final_data['Band_3'] + final_data['Band_8'])
+
+    # interactive terms
+    # for col1 in final_data.columns:
+    #     for col2 in final_data.columns:
+    #         if col1 != col2:
+    #             final_data[f'{col1}_{col2}_interaction'] = final_data[col1] * final_data[col2]
+    
+    exclude_columns = ['UHI Index', 'Longitude', 'Latitude']
+    feature_names = [col for col in final_data.columns if col not in exclude_columns]
+    # square term, cube term
+    for col in feature_names:
+        final_data[f'{col}_squared'] = final_data[col] ** 2
+        final_data[f'{col}_cubed'] = final_data[col] ** 3
+    
+    final_data.to_csv("feature_engineering.csv")
+    
+    if dataset != "train":
         final_data.drop(columns = ["UHI Index"], inplace=True)
         
     return final_data

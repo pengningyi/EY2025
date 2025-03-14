@@ -152,15 +152,16 @@ def r2_score(target, predictions):
 
 
 
-def generate_submission(trainer, test_data_path = '../data/Submission_template.csv', data_type = 'tensor'):
+def generate_submission(trainer, data_path, test_data_path = '../data/Submission_template.csv', data_type = 'tensor'):
     """
     Generate predictions and create a submission file.
     """
     test_data = pd.read_csv(test_data_path)
 
     from data import get_sentinel_data
-    val_data = get_sentinel_data(dataset="test")
-
+    val_data = get_sentinel_data(data_path, dataset="test")
+    print(val_data.columns)
+    print(val_data.shape)
     submission_val_data=val_data.drop(columns = ["Latitude", "Longitude"])
 
     submission_val_data = submission_val_data.values
