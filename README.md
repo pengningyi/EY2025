@@ -101,3 +101,15 @@ so we use MAE and MSE as Loss func. Huber Loss as well.
 - combine everything together
 - 
 
+
+# Feature engineering
+1. Change the `final_data` dataframe in src/data.py function 'get_sentinel_data'
+2. PCA/Tsne on `final_data` ?
+3. More features?
+
+
+# Model Stacking
+- Xgboost,
+- Catboost,
+- Lgbm
+
