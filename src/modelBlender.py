@@ -18,8 +18,12 @@ class ModelBlender:
         }
         
         self.cat_params = cat_params if cat_params else {
-            'iterations': 1000, 'learning_rate': 0.005, 'depth': 12,
-            'random_seed': 42, 'verbose': 0
+            'iterations': 1200,
+            'learning_rate': 0.01,
+            'depth': 10,
+            'l2_leaf_reg': 5,
+            'random_seed': 42,
+            'verbose': 0
         }
         
         # Initialize models
