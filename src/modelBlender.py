@@ -21,7 +21,7 @@ class ModelBlender:
             'iterations': 1000, 'learning_rate': 0.005, 'depth': 12,
             'random_seed': 42, 'verbose': 0
         }
-        
+
         # Initialize models
         self.xgb = XGBRegressor(**self.xgb_params)
         self.lgb = LGBMRegressor(**self.lgb_params)
