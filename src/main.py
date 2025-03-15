@@ -7,7 +7,9 @@ from wideDeep import WideAndDeepTrainer
 from tabnet import TabNetTrainer
 from xgb_trainer import XGBoostTrainer
 from modelBlender import ModelBlender
+from lgbm_trainer import LGBMTrainer
 from data import get_sentinel_data
+
 
 def main(args):
     os.makedirs(args.results_path, exist_ok=True)
@@ -44,6 +46,21 @@ def main(args):
         X_train, X_val, X_test, y_train, y_val, y_test = split_data(X, y, args.test_size, args.val_size, args.seed, data_type="dataframe")
         trainer = ModelBlender()
         results_path = os.path.join(args.results_path, f"{args.model_type}_{args.epochs}_{args.batch_size}_{args.lr}_{args.seed}_results.json")
+
+    elif args.model_type == "lgbm":
+        X_train, X_val, X_test, y_train, y_val, y_test = split_data(X, y, args.test_size, args.val_size, args.seed, data_type="dataframe")
+        trainer = LGBMTrainer(
+        learning_rate=args.lr,
+        num_leaves=args.num_leaves_lgbm,
+        n_estimators=args.n_estimators_lgbm,
+        max_depth=args.max_depth_lgbm,
+        subsample=args.subsample_lgbm,
+        random_state=args.seed,
+        use_best_params=True  # Automatically use tuned params if available
+    )
+
+        results_path = os.path.join(args.results_path, f"{args.model_type}_{args.n_estimators}_{args.max_depth}_{args.lr}_{args.subsample}_{args.colsample_bytree}_{args.reg_alpha}_{args.reg_lambda}_{args.seed}_results.json")
+    
     else:
         raise ValueError(f"Unsupported model type: {args.model_type}")
 
@@ -71,11 +88,11 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train and evaluate models.")
 
-    parser.add_argument("--data_path", type=str, default= 'C:\\Users\\16539\\Documents\\Aalto\\25spring\\EY2025\\data\\Training_data_uhi_index_2025-02-18.csv', help="Path to the data file.")
+    parser.add_argument("--data_path", type=str, default= 'C:\\Users\\T\\OneDrive\\Msc Macadamia\\EYChallenge\\EY2025\\data\\Training_data_uhi_index_2025-02-18.csv', help="Path to the data file.")
     parser.add_argument("--submission_data_path", type=str, default= '../data/Submission_template.csv', help="Path to the submission file.")
     parser.add_argument("--results_path", type=str, default="../results", help="Directory to save results.")
 
-    parser.add_argument("--model_type", type=str, required=True, choices=["MLP", "WideAndDeep", "TabNet", "XGBoost","ModelBlender"], help="Type of model to train.")
+    parser.add_argument("--model_type", type=str, required=True, choices=["MLP", "WideAndDeep", "TabNet", "XGBoost","lgbm", "ModelBlender"], help="Type of model to train.")
 
     parser.add_argument("--epochs", type=int, default=20, help="Number of training epochs.")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size.")
@@ -96,6 +113,12 @@ if __name__ == "__main__":
     parser.add_argument("--colsample_bytree", type=float, default=1, help="")
     parser.add_argument("--reg_alpha", type=float, default=0, help="")
     parser.add_argument("--reg_lambda", type=float, default=1, help="")
+
+    parser.add_argument("--num_leaves_lgbm", type=int, default=285, help="Number of leaves for LGBM.")
+    parser.add_argument("--n_estimators_lgbm", type=int, default=100, help="Number of estimators for LGBM.")
+    parser.add_argument("--max_depth_lgbm", type=int, default=15, help="Max depth for LGBM.")
+    parser.add_argument("--subsample_lgbm", type=float, default=0.975, help="Subsample for LGBM.")
+    parser.add_argument("--learning_rate_lgbm", type=float, default=0.0014, help="Learning rate for LGBM.")
     
     
     args = parser.parse_args()
