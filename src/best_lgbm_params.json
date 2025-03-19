@@ -1,0 +1,7 @@
+{
+    "num_leaves": 285,
+    "max_depth": 15,
+    "learning_rate": 0.0013752950048607,
+    "n_estimators": 100,
+    "subsample": 0.9757278908422369
+}
