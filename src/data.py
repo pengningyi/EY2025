@@ -238,8 +238,6 @@ def get_sentinel_data(data_path, dataset = "train"):
     ])
     
     # PCA
-    
-    
 
     # Now combined_data has shape (bands + 3, height, width)
     # use this combined_data as input features for your ML model
@@ -265,7 +263,8 @@ def get_sentinel_data(data_path, dataset = "train"):
     #         if col1 != col2:
     #             final_data[f'{col1}_{col2}_interaction'] = final_data[col1] * final_data[col2]
     
-    exclude_columns = ['UHI Index', 'Longitude', 'Latitude']
+    # exclude_columns = ['UHI Index', 'Longitude', 'Latitude']
+    exclude_columns = ['UHI Index']
     feature_names = [col for col in final_data.columns if col not in exclude_columns]
     # square term, cube term
     for col in feature_names:
@@ -274,7 +273,45 @@ def get_sentinel_data(data_path, dataset = "train"):
     
     final_data.to_csv("feature_engineering.csv")
     
+    from sklearn.decomposition import PCA
+    import pandas as pd
+
+    exclude_columns = ['UHI Index', 'Longitude', 'Latitude']
+    feature_names = [col for col in final_data.columns if col not in exclude_columns]
+    print(feature_names)
+
+    X = final_data[feature_names]
+    
+    from sklearn.preprocessing import StandardScaler, MinMaxScaler
+
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+    
+    from umap import UMAP
+    from sklearn.manifold import TSNE
+    from sklearn.manifold import Isomap
+    from sklearn.manifold import LocallyLinearEmbedding
+    from sklearn.decomposition import PCA
+
+    pca = PCA(n_components=0.95)
+    X_pca = pca.fit_transform(X_scaled)
+
+    X_pca_df = pd.DataFrame(X_pca, columns=[f'PC{i+1}' for i in range(X_pca.shape[1])])
+    
+    # umap = UMAP(n_components=3)
+    # X_umap = umap.fit_transform(X_scaled)
+
+    # X_umap_df = pd.DataFrame(X_umap, columns=[f'umap{i+1}' for i in range(X_umap.shape[1])])
+
+    exclude_data = final_data[exclude_columns]
+
+    final_data_pca = pd.concat([exclude_data, X_pca_df], axis=1)
+
+    final_data_pca.to_csv("feature_engineering.csv", index=False)
+    
     if dataset != "train":
-        final_data.drop(columns = ["UHI Index"], inplace=True)
+        final_data_pca.drop(columns = ["UHI Index"], inplace=True)
+    
+    print(final_data_pca.shape)
         
-    return final_data
+    return final_data_pca
