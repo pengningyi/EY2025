@@ -10,6 +10,17 @@ from modelBlender import ModelBlender
 from lgbm_trainer import LGBMTrainer
 from cnn import CNN1DTrainer
 from data import get_sentinel_data
+import numpy as np
+
+def convert_float32_to_float(obj):
+    if isinstance(obj, np.float32):
+        return float(obj)
+    elif isinstance(obj, dict):
+        return {k: convert_float32_to_float(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_float32_to_float(v) for v in obj]
+    else:
+        return obj
 
 def main(args):
     os.makedirs(args.results_path, exist_ok=True)
@@ -51,7 +62,7 @@ def main(args):
         results_path = os.path.join(args.results_path, f"{args.model_type}_{args.hidden_units}_{args.epochs}_{args.batch_size}_{args.lr}_{args.seed}_results.json")
     elif args.model_type == "ModelBlender":
         X_train, X_val, X_test, y_train, y_val, y_test = split_data(X, y, args.test_size, args.val_size, args.seed, data_type="dataframe")
-        trainer = ModelBlender()
+        trainer = ModelBlender(input_dimension=X_train.shape[1])
         results_path = os.path.join(args.results_path, f"{args.model_type}_{args.epochs}_{args.batch_size}_{args.lr}_{args.seed}_results.json")
 
     elif args.model_type == "lgbm":
@@ -97,11 +108,11 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train and evaluate models.")
 
-    parser.add_argument("--data_path", type=str, default= 'C:\\Users\\T\\OneDrive\\Msc Macadamia\\EYChallenge\\EY2025\\data\\Training_data_uhi_index_2025-02-18.csv', help="Path to the data file.")
-    parser.add_argument("--submission_data_path", type=str, default= '../data/Submission_template.csv', help="Path to the submission file.")
+    parser.add_argument("--data_path", type=str, default= '../data/feature/Training_data_uhi_index_cleaned_dodo.csv', help="Path to the data file.")
+    parser.add_argument("--submission_data_path", type=str, default= '../data/feature/Submission_test_mapped.csv', help="Path to the submission file.")
     parser.add_argument("--results_path", type=str, default="../results", help="Directory to save results.")
 
-    parser.add_argument("--model_type", type=str, required=True, choices=["MLP", "WideAndDeep", "TabNet", "XGBoost","ModelBlender"], help="Type of model to train.")
+    parser.add_argument("--model_type", type=str, required=True, choices=["MLP", "WideAndDeep", "TabNet", "XGBoost","ModelBlender", "CNN1D"], help="Type of model to train.")
 
     parser.add_argument("--epochs", type=int, default=50, help="Number of training epochs.")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size.")

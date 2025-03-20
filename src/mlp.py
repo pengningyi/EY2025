@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 from sklearn.metrics import root_mean_squared_error, mean_absolute_error
 from loss import huber_loss, custom_weighted_rmse
+import copy
 
 class MLPModel(nn.Module):
     def __init__(self, input_dim, hidden_units=[128, 64], dropout_rate=0.3):
